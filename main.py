@@ -34,6 +34,17 @@ def main():
                 f.write(file)
             bot.reply_to(message, "Гиф успешно сохранена, приступаю к обработке!")
 
+    @bot.message_handler(content_types=['animation'])
+    def handle_animation(message):
+            bot.reply_to(message, "Обрабатываю...")
+            file_info = bot.get_file(message.document.file_id).file_path
+            file = bot.download_file(file_info)
+            with open("temp.mp4", 'wb') as f:
+                f.write(file)
+            clip = VideoFileClip('temp.mp4')
+            clip.write_gif('temp.gif')
+            bot.reply_to(message, "Гиф успешно сохранена, приступаю к обработке!")
+
     bot.infinity_polling()
 
 
