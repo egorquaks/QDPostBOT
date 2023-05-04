@@ -14,6 +14,7 @@ def create_config():
         }
         with open(config_file, 'w') as configfile:
             config.write(configfile)
+        sys.exit()
 
 
 def main():
