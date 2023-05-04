@@ -24,6 +24,16 @@ def main():
     def get_text_messages(message):
         bot.send_message(message.from_user.id, "Пришли мне изображение которое ты хотел бы обработать")
 
+    @bot.message_handler(content_types=['document'])
+    def handle_gif(message):
+        if message.document.mime_type == "image/gif":
+            bot.reply_to(message, "Обрабатываю...")
+            file_info = bot.get_file(message.document.file_id).file_path
+            file = bot.download_file(file_info)
+            with open("temp.gif", 'wb') as f:
+                f.write(file)
+            bot.reply_to(message, "Гиф успешно сохранена, приступаю к обработке!")
+
     bot.infinity_polling()
 
 
