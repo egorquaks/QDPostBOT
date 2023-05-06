@@ -18,6 +18,37 @@ def create_frame_array(gif_path):
     return frames
 
 
+def convert_to_gif(video_path, gif_path):
+    clip = VideoFileClip(video_path)
+    duration_per_frame = 1 / clip.fps  # Рассчитываем длительность каждого кадра
+
+    frames = []
+    for frame in clip.iter_frames():
+        img = Image.fromarray(frame)
+        frames.append(img)
+
+    # Сохраняем GIF-анимацию с использованием исходной частоты кадров
+    frames[0].save(gif_path, save_all=True, append_images=frames[1:], loop=0, duration=duration_per_frame * 1000)
+
+
+def crop_image(image_path, target_size):
+    with Image.open(image_path) as im:
+        # Определяем размер исходного изображения
+        original_width, original_height = im.size
+
+        # Вычисляем границы для обрезки изображения
+        target_width, target_height = target_size
+        left = (original_width - target_width) // 2
+        top = (original_height - target_height) // 2
+        right = left + target_width
+        bottom = top + target_height
+
+        # Обрезаем изображение
+        cropped_image = im.crop((left, top, right, bottom))
+
+    return cropped_image
+
+
 def create_config():
     config_file = 'config.ini'
     if not os.path.isfile(config_file):
