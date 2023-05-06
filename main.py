@@ -72,18 +72,22 @@ def resize():
         for frame in source_frames:
             frame1 = frame.resize((1856, hsize))
             frames_resized.append(frame1)
-
         # Создаем новую гиф-анимацию с заданными параметрами
         frames = []
         duration = []
+        text = Image.open('showcase solo.png')
+        logo = Image.open('logos.png')
         for frame in frames_resized:
-            new_frame = Image.new('RGBA', (1920, hsize + 396), (0, 0, 0, 0))
+            # new_frame = Image.new('RGBA', (1920, hsize + 396), (0, 0, 0, 0))
+            new_frame = crop_image('background.png', (1920, hsize + 396))
             new_frame.paste(frame, ((1920 - frame.width) // 2, 354))
+            new_frame.paste(text, (0, 0), text)
+            new_frame.paste(logo, (0, 0), logo)
             frames.append(new_frame)
             duration.append(frame.info['duration'])
 
         # Сохраняем новую гиф-анимацию
-        frames[0].save('new.gif', save_all=True, append_images=frames[1:], loop=0, duration=duration)
+        frames[0].save('new.gif', save_all=True, append_images=frames[1:], loop=0, duration=duration, optimize=True)
 
 
 def main():
@@ -106,6 +110,9 @@ def main():
                 f.write(file)
             bot.reply_to(message, "Гиф успешно сохранена! Обрабатываю")
             resize()
+            bot.reply_to(message, "Обработано")
+            f = open("new.gif", "rb")
+            bot.send_document(message.chat.id, f)
 
     @bot.message_handler(content_types=['animation'])
     def handle_animation(message):
@@ -114,10 +121,12 @@ def main():
         file = bot.download_file(file_info)
         with open("temp.mp4", 'wb') as f:
             f.write(file)
-        clip = VideoFileClip('temp.mp4')
-        clip.write_gif('temp.gif')
+        convert_to_gif('temp.mp4', 'temp.gif')
         bot.reply_to(message, "Гиф успешно сохранена! Обрабатываю")
         resize()
+        bot.reply_to(message, "Обработано")
+        f = open("new.gif", "rb")
+        bot.send_document(message.chat.id, f)
 
     bot.infinity_polling()
 
